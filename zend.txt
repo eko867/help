@@ -1,0 +1,46 @@
+1) скелет распаковываем в папку с сайтом (https://github.com/zendframework/ZendSkeletonApplication/releases/tag/zf%2Frelease-2.2.6)
+2) через композер подключаем сам ZF (https://github.com/zendframework/zendframework/releases/tag/release-2.3.0) (встанет в папку \vendor\Zendframework)
+3) через композер ставим zend-developer-tools (https://github.com/zendframework/zend-developer-tools/releases/tag/0.0.2) (прописали его в \config\application.config.php и добавили \config\autoload\zenddevelopertools.local.php )
+	первый модуль у нас \modules\Application (обычно его не трогают)
+	второй модуль у нас \vendor\zendframework\zend-developer-tools (вообще то, что от vendor лучше не трогать, так как это уже готовый код)
+	---другие модули создадим потом
+
+\module\Application\config\module.config.php - тут сидит в.т.ч. роутинг
+module\Application\view\layout\layout.phtml - тут вьюшка 
+
+4*) изменили стиль (https://bootswatch.com/flatly/)
+	тупо копипаст https://bootswatch.com/4/flatly/bootstrap.css в наш \public\css\bootstrap.css
+	тупо копипаст https://bootswatch.com/_assets/css/custom.min.css в наш public\css\bootstrap-theme.min.css
+	закоментили в module\Application\view\layout\layout.phtml  строку с /css/style.css
+		работает чето криво, откатил обратно
+
+5) cоздаем свой модуль \module\Blog (привыкаем сразу делать папки:
+							 сonfig-настройки самого модуля(интерпретатор прочитает и все сольет в одно, можно узреть в developer-tools)
+							 src,view - для контроллеров и представления
+						         Module.php-показывает как скелету работать с при загрузке модулем)
+   +указать его в автозагрузке прописав в \config\application.config.php
+	для всех экшенов контроллеров из src будет хотя бы одно представление во view
+	в config настроили роутинг + подменили роутинг главной страницы, отняв его у контроллера Application и наделив контроллер Blog (теперь Блог - главный модуль нашего сайта)
+	в controllers описали контроллер с экшеном, во view представлении сделали страничку под выгрузку результатов
+6) через композер ставим доктрину (https://github.com/doctrine/DoctrineORMModule/releases/tag/0.8.0)
+	проиписываем connection settings в созданном файле \config\autoload\doctrine.local.php   //когда есть .global, то сначала лезет в .local
+	прописываем entities settings в конфигах модуля Blog \module\Blog\config\module.config.php
+7) логично сделать админку (потом сайт могут заполнять контент-мэйкеры)
+	создаем модуль \module\Admin аналогично п.5
+	**почему роутинг заканчивается слэшем? site.ru/admin/ - это для сео-оптимизации	**поисковый робот воспринимает site.ru/admin/ и site.ru/admin как две страницы, поэтому если они обе будут рабочие, то на них одинаковый контент - это плохо для СЕО)
+
+8) cоздали БД zblog с таблицами category, article, comment. Запилим три сущности для этих таблиц
+	написали батник \vendor\bin\1.bat и выполнили его
+	в \module\Blog\src\Blog\Entity появились классы-сущности для таблиц нашей БД и геттеры/сеттеры
+
+9) создаем CRUD-операции для \module\Blog\src\Blog\Entity\Сategory
+	добавили контроллер для Category: \module\Admin\src\Admin\Controller\CategoryController.php
+	запилили представление: \module\Admin\view\admin\index\index.phtml
+	прописали роутинг /admin/category и сам контроллер в : \module\Admin\config\module.config.php
+	написали в indexAction'e СategoryController'a DSQL запрос на получение строк из этой таблицы БД
+	во вьюшке \module\Admin\view\admin\сategory\index.phtml запилили выгрузку результатов в хтмл таблицу + хтмл ссылки на удаление/редактирование
+
+
+
+	
+
