@@ -16,7 +16,7 @@ module\Application\view\layout\layout.phtml - тут вьюшка
 
 5) cоздаем свой модуль \module\Blog (привыкаем сразу делать папки:
 							 сonfig-настройки самого модуля(интерпретатор прочитает и все сольет в одно, можно узреть в developer-tools)
-							 src,view - для контроллеров и представления
+							 src,view - для контроллеров+сущностей и представления
 						         Module.php-показывает как скелету работать с при загрузке модулем)
    +указать его в автозагрузке прописав в \config\application.config.php
 	для всех экшенов контроллеров из src будет хотя бы одно представление во view
@@ -33,12 +33,33 @@ module\Application\view\layout\layout.phtml - тут вьюшка
 	написали батник \vendor\bin\1.bat и выполнили его
 	в \module\Blog\src\Blog\Entity появились классы-сущности для таблиц нашей БД и геттеры/сеттеры
 
+	работать с сущностями будем через менеджер зависимостей (его можно получить из методов контроллера), и вместо запросов к БД, юзать сервисы этого менеджера (как find(), persist(), remove(), createQuery() )
+
 9) создаем CRUD-операции для \module\Blog\src\Blog\Entity\Сategory
+	READ
 	добавили контроллер для Category: \module\Admin\src\Admin\Controller\CategoryController.php
 	запилили представление: \module\Admin\view\admin\index\index.phtml
 	прописали роутинг /admin/category и сам контроллер в : \module\Admin\config\module.config.php
 	написали в indexAction'e СategoryController'a DSQL запрос на получение строк из этой таблицы БД
 	во вьюшке \module\Admin\view\admin\сategory\index.phtml запилили выгрузку результатов в хтмл таблицу + хтмл ссылки на удаление/редактирование
+		(на страничке со view $this - объект класса Zend\View\Rendered\PhpRenderer   (далее работа с буфером ob, накапливая __content) )
+
+	СREATE
+	создали классы BaseController и BaseAdminController (для более удобной работы c entityManager), а CategoryController сделали его наследником
+	в CategoryController создали экшн для /admin/category/add (он работает с классом СategoryAddForm extends Form) и менеджером сущностей)
+		//у абстрактного родительского контроллера есть плагины(Redirect,FlashMessenger,Url,Params,Layout,Forward)
+            	//у уже у плагинов свои методы
+            	//попасть к плагину можно за счет магич.метода __call()
+            	//достаточно у объекта контроллера вызвать поле с названием плагина (а дальше можно и методы плагина)
+	Представление формы для /admin/category/add/index.phtml создаем, работая с СategoryAddForm (т.е читаем объект и создаем хтмл-код через echo)
+	При успешном добавлении редиректимся  на /admin/category/index.phtml (это уже cм.READ)
+
+	UPDATE
+	написали экшн editAction, вьюшку edit.phtml - все по образу и подобию CREATE
+
+	DELETE
+	написали экшн deletaAction, вьюшка не нужна (кликнул, вызвался контроллер, сделал экшн, редиректнулся в админку, запись пропала из списка)
+
 
 
 
